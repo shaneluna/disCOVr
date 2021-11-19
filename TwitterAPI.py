@@ -1,21 +1,16 @@
 # %%
 # module imports
 import requests
-import os
 from urllib.parse import urlencode
 import logging
+import time
+import yaml
 
-# %%
-# Referencing twitter api v2 sample python code:
-# https://github.com/twitterdev/Twitter-API-v2-sample-code/blob/main/Tweet-Lookup/get_tweets_with_bearer_token.py
+# Ref: https://github.com/twitterdev/Twitter-API-v2-sample-code/blob/main/Tweet-Lookup/get_tweets_with_bearer_token.py
 
-# logging.basicConfig(level=os.environ.get("LOGLEVEL", "INFO"))
-# logging.basicConfig(level=logging.DEBUG)
-
-# %%
-# Re-review format; lost level
-FORMAT = "[%(filename)s:%(lineno)s - %(funcName)s() ] %(message)s"
+FORMAT = '%(asctime)s | %(levelname)s | %(name)s | %(funcName)s() | %(message)s'
 logging.basicConfig(format=FORMAT, level=logging.DEBUG)
+logging.Formatter.converter = time.gmtime
 
 # %%
 # log handler function
@@ -32,10 +27,9 @@ class TwitterAPI(LoggingHandler):
 
     def __init__(self):
         super(TwitterAPI, self).__init__()
-        # To set your enviornment variables in your terminal run the following line:
-        # export 'BEARER_TOKEN'='<your_bearer_token>'
-        # self.BEARER_TOKEN = os.environ.get("BEARER_TOKEN")
-        self.BEARER_TOKEN = open('bearer_token').read()
+        with open("config.yaml", "r") as yamlfile:
+            config = yaml.safe_load(yamlfile)
+        self.BEARER_TOKEN = config["twitter"]["bearer_token"]
         self.BASE_URL = "https://api.twitter.com/2"
 
     def get_bearer_header(self):
@@ -68,14 +62,14 @@ class TwitterAPI(LoggingHandler):
             # throw exception?
             return {}
         r_json = r.json()
-        if "errors" in r_json:
-            self.log.error(f"API Error - {r_json['errors']=}")
+        # if "errors" in r_json:
+        #     self.log.error(f"API Error - {r_json['errors']=}")
         return r_json
 
 # %%
 # demo scrape for singluar id
 twitter = TwitterAPI()
-# res = twitter.search_tweet("1213330173736738817")
-res = twitter.search_tweet("1214195710301618178")
+res = twitter.search_tweet("1213330173736738817")
+# res = twitter.search_tweet("1214195710301618178", fields="")
 print()
 print(res)
