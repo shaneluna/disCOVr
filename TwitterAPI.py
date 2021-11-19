@@ -1,3 +1,5 @@
+# %%
+# module imports
 import requests
 from urllib.parse import urlencode
 import logging
@@ -10,10 +12,14 @@ FORMAT = '%(asctime)s | %(levelname)s | %(name)s | %(funcName)s() | %(message)s'
 logging.basicConfig(format=FORMAT, level=logging.DEBUG)
 logging.Formatter.converter = time.gmtime
 
+# %%
+# log handler function
 class LoggingHandler():
     def __init__(self, *args, **kwargs):
         self.log = logging.getLogger(self.__class__.__name__)
 
+# %%
+# api function
 class TwitterAPI(LoggingHandler):
 
     requests_log = logging.getLogger("requests.packages.urllib3")
@@ -80,6 +86,8 @@ class TwitterAPI(LoggingHandler):
         #     self.log.error(f"API Error - {r_json['errors']=}")
         return r_json
 
+# %%
+# demo scrape for singluar id
 twitter = TwitterAPI()
 res = twitter.search_tweet("1213330173736738817", fields="all")
 # res = twitter.search_tweet("1214195710301618178", fields="")
