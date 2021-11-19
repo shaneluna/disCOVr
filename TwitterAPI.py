@@ -1,22 +1,30 @@
+# %%
+# module imports
 import requests
 import os
 from urllib.parse import urlencode
 import logging
 
+# %%
 # Referencing twitter api v2 sample python code:
 # https://github.com/twitterdev/Twitter-API-v2-sample-code/blob/main/Tweet-Lookup/get_tweets_with_bearer_token.py
 
 # logging.basicConfig(level=os.environ.get("LOGLEVEL", "INFO"))
 # logging.basicConfig(level=logging.DEBUG)
 
+# %%
 # Re-review format; lost level
 FORMAT = "[%(filename)s:%(lineno)s - %(funcName)s() ] %(message)s"
 logging.basicConfig(format=FORMAT, level=logging.DEBUG)
 
+# %%
+# log handler function
 class LoggingHandler():
     def __init__(self, *args, **kwargs):
         self.log = logging.getLogger(self.__class__.__name__)
 
+# %%
+# api function
 class TwitterAPI(LoggingHandler):
 
     requests_log = logging.getLogger("requests.packages.urllib3")
@@ -64,6 +72,8 @@ class TwitterAPI(LoggingHandler):
             self.log.error(f"API Error - {r_json['errors']=}")
         return r_json
 
+# %%
+# demo scrape for singluar id
 twitter = TwitterAPI()
 # res = twitter.search_tweet("1213330173736738817")
 res = twitter.search_tweet("1214195710301618178")
