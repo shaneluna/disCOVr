@@ -35,7 +35,7 @@ class TwitterAPI(LoggingHandler):
         # To set your enviornment variables in your terminal run the following line:
         # export 'BEARER_TOKEN'='<your_bearer_token>'
         # self.BEARER_TOKEN = os.environ.get("BEARER_TOKEN")
-        self.BEARER_TOKEN = ""
+        self.BEARER_TOKEN = open('bearer_token').read()
         self.BASE_URL = "https://api.twitter.com/2"
 
     def get_bearer_header(self):
