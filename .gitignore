@@ -133,3 +133,6 @@ dmypy.json
 
 # Project data
 data/
+
+# TwitterAPI credentials
+bearer_token
