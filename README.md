@@ -15,3 +15,4 @@ i.e. Download the Twitter Chatter dataset (full_dataset.tsv.gz). Move the file t
 3. It's recommended to create a new python env; install the requirements.txt in your python environment.<br>
 `pip install -r requirements.txt`
 
+4. Create a copy of the `configexample.yaml` file, rename to `config.yaml` and update with your config info.

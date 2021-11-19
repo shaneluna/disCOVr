@@ -36,16 +36,36 @@ class TwitterAPI(LoggingHandler):
         return {
             "Authorization": f"Bearer {self.BEARER_TOKEN}"
         }
-        # r.headers["User-Agent"] = "v2TweetLookupPython"
 
     def search_tweet(self, ids: str, fields: str="author_id,lang"):
-        # Tweet field options include:
-        # attachments, author_id, context_annotations,
-        # conversation_id, created_at, entities, geo, id,
-        # in_reply_to_user_id, lang, non_public_metrics, organic_metrics,
-        # possibly_sensitive, promoted_metrics, public_metrics, referenced_tweets,
-        # source, text, and withheld
-        # self.log.info(f"{ids=}")
+        twitter_fields = {
+            "sensitive": [
+                "non_public_metrics",
+                "organic_metrics",
+                "promoted_metrics"
+            ],
+            "non-sensitive": [
+                "attachments",
+                "author_id",
+                "context_annotations",
+                "conversation_id",
+                "created_at",
+                "entities",
+                "geo",
+                "id",
+                "in_reply_to_user_id",
+                "lang",
+                "possibly_sensitive",
+                "public_metrics",
+                "referenced_tweets",
+                "source",
+                "text",
+                "withheld"
+            ]
+        }
+        if fields == "all": # all non-sensitive
+            fields = ",".join(twitter_fields["non-sensitive"])
+        
         self.log.info(locals())
         endpoint = f"{self.BASE_URL}/tweets"
         headers = self.get_bearer_header()
@@ -69,7 +89,7 @@ class TwitterAPI(LoggingHandler):
 # %%
 # demo scrape for singluar id
 twitter = TwitterAPI()
-res = twitter.search_tweet("1213330173736738817")
+res = twitter.search_tweet("1213330173736738817", fields="all")
 # res = twitter.search_tweet("1214195710301618178", fields="")
 print()
 print(res)
