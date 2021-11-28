@@ -132,7 +132,8 @@ dmypy.json
 .DS_Store
 
 # Project data
-data/
+data/*.csv
 
 # Configs
 *config.yaml
+discovr*.json
