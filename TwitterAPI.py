@@ -27,7 +27,7 @@ class TwitterAPI(LoggingHandler):
 
     def __init__(self):
         super(TwitterAPI, self).__init__()
-        with open("config.yaml", "r") as yamlfile:
+        with open("data/config.yaml", "r") as yamlfile:
             config = yaml.safe_load(yamlfile)
         self.BEARER_TOKEN = config["twitter"]["bearer_token"]
         self.BASE_URL = "https://api.twitter.com/2"
