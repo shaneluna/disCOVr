@@ -26,8 +26,8 @@ if __name__ == '__main__':
     # write json output to file
 
     twitter = TwitterAPI()
-    res = twitter.search_tweets("1213330173736738817", fields="all")
-    # res = twitter.search_tweets("1213330173736738817,1223120931377123329", fields="all")
-    print(res['data'])
-    # create_directory("./output")
-    # write_pretty_json_to_file(res['data'], './output/test.json')
+    # res = twitter.search_tweets("1213330173736738817", fields="all")
+    res = twitter.search_tweets("1213330173736738817,1223120931377123329", fields="all")
+    # print(res)
+    create_directory("./output")
+    write_pretty_json_to_file(res, './output/test.json')
