@@ -16,3 +16,14 @@ i.e. Download the Twitter Chatter dataset (full_dataset.tsv.gz). Move the file t
 `pip install -r requirements.txt`
 
 4. Create a copy of the `configexample.yaml` file, rename to `config.yaml` and update with your config info.
+
+
+## Protobuf
+
+1. To make changes to protobuf files/schema, download and install the relevant compiler tool: https://github.com/protocolbuffers/protobuf/releases.
+- Install protoc
+- Setup for language
+
+
+
+

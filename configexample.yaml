@@ -1,3 +1,7 @@
 ---
 twitter:
-  bearer_token: abcdefghijklmnopqrstuvwxyz
+  oauth1.0a:
+    consumer_key: abcdefghijklmnopqrstuvwxyz
+    consumer_secret: abcdefghijklmnopqrstuvwxyz
+  oauth2.0:
+    bearer_token: abcdefghijklmnopqrstuvwxyz
