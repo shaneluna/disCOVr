@@ -3,5 +3,7 @@ twitter:
   oauth1.0a:
     consumer_key: abcdefghijklmnopqrstuvwxyz
     consumer_secret: abcdefghijklmnopqrstuvwxyz
+    access_token: abcdefghijklmnopqrstuvwxyz
+    access_token_secret: abcdefghijklmnopqrstuvwxyz
   oauth2.0:
     bearer_token: abcdefghijklmnopqrstuvwxyz

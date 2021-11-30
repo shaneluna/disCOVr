@@ -2,6 +2,7 @@ import tweepy
 import yaml
 import os
 import json
+import time
 from pyspark.sql import SparkSession
 import pandas as pd
 
@@ -47,6 +48,8 @@ def write_json_to_csv(json_string, filepath):
     
 
 if __name__ == '__main__':
+    start_time = time.time()
+
     client = get_tweepy_client()
 
     expansions = ",".join([
@@ -201,3 +204,5 @@ if __name__ == '__main__':
         # if "meta" in response_json:
         #     write_json_to_csv(response_json["meta"], "./output/meta.csv")
         count+=1
+    
+    print("--- %s seconds ---" % (time.time() - start_time))
