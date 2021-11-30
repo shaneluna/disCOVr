@@ -1,14 +1,16 @@
 import tweepy
-from tweepy import poll
-from tweepy import place
 import yaml
+import os
+import json
+from pyspark.sql import SparkSession
+import pandas as pd
 
 def read_yaml_config():
     with open("config.yaml", "r") as yamlfile:
         config = yaml.safe_load(yamlfile)
     return config
 
-if __name__ == '__main__':
+def get_tweepy_client():
     config = read_yaml_config()
     bearer_token = config["twitter"]["oauth2.0"]["bearer_token"]
     consumer_key = config["twitter"]["oauth1.0a"]["consumer_key"]
@@ -24,8 +26,30 @@ if __name__ == '__main__':
         access_token_secret=access_token_secret,
         wait_on_rate_limit=True
     )
+    return client
 
-    expansions = [
+def create_directory(path):
+    already_exists = os.path.exists(path)
+    # if no, create; else, do nothing
+    if not already_exists: os.makedirs(path)
+
+def write_pretty_json_to_file(json_string, filepath):
+    with open(filepath, 'w', encoding="utf-8") as f:
+        json.dump(json_string, f, ensure_ascii=False, indent=4)
+
+def write_json_to_csv(json_string, filepath):
+    # file does not exist
+    if not os.path.isfile(filepath):
+        pd.json_normalize(json_string).to_csv(filepath, index=False, mode='w')
+    # file already exists
+    else:
+        pd.json_normalize(json_string).to_csv(filepath, index=False, mode='a', header=False)
+    
+
+if __name__ == '__main__':
+    client = get_tweepy_client()
+
+    expansions = ",".join([
         "attachments.poll_ids",
         "attachments.media_keys", 
         "author_id",
@@ -34,9 +58,9 @@ if __name__ == '__main__':
         "in_reply_to_user_id",
         "referenced_tweets.id",
         "referenced_tweets.id.author_id"
-    ]
+    ])
 
-    media_fields = [
+    media_fields = ",".join([
         "duration_ms",
         "height",
         "media_key",
@@ -49,9 +73,9 @@ if __name__ == '__main__':
         "organic_metrics",
         "promoted_metrics",
         "alt_text"
-    ]
+    ])
     
-    place_fields = [
+    place_fields = ",".join([
         "contained_within",
         "country",
         "country_code",
@@ -60,17 +84,17 @@ if __name__ == '__main__':
         "id",
         "name",
         "place_type"
-    ]
+    ])
 
-    poll_fields = [
+    poll_fields = ",".join([
         "duration_minutes",
         "end_datetime",
         "id",
         "options",
         "voting_status"
-    ]
+    ])
 
-    user_fields = [
+    user_fields = ",".join([
         "created_at",
         "description",
         "entities",
@@ -85,9 +109,9 @@ if __name__ == '__main__':
         "username",
         "verified",
         "withheld"
-    ]
+    ])
 
-    tweet_fields = [
+    tweet_fields = ",".join([
         "attachments",
         "author_id",
         "context_annotations",
@@ -105,7 +129,7 @@ if __name__ == '__main__':
         "source",
         "text",
         "withheld"
-    ]
+    ])
 
     # public_tweets = api.get_tweets(user_auth=True, ids=["1213330173736738817","1223120931377123329"])
     # public_tweets = client.get_tweets(
@@ -120,18 +144,60 @@ if __name__ == '__main__':
     # )
     # print(public_tweets)
 
-    tweets = client.request(
-        method="GET", 
-        route="/2/tweets", 
-        params={
-            "ids": "1213330173736738817",
-            "expansions": ",".join(expansions),
-            "media.fields": ",".join(media_fields),
-            "place.fields": ",".join(place_fields),
-            "poll.fields": ",".join(poll_fields),
-            "user.fields": ",".join(user_fields),
-            "tweet.fields": ",".join(tweet_fields)
-        }, 
-        user_auth=True
-    )
-    print(tweets.json())
+    create_directory("./output")
+
+    spark = SparkSession.builder \
+    .master("local[*]") \
+    .appName("Test") \
+    .config('sprk.sql.session.timeZone', 'UTC') \
+    .getOrCreate()
+
+    spark.read.option("header", True).option("delimiter", ",").csv("./data/reCOVery/recovery-social-media-data.txt").createOrReplaceTempView("tweets")
+
+    spark.sql("""
+    SELECT *, monotonically_increasing_id() AS idx
+    FROM tweets
+    """).createOrReplaceTempView("tweets2")
+
+    count = 0
+    start = 0
+    end = start+99
+    while start < 140820: #row count
+    # while start < 200:
+        # get ids
+        ids = ",".join(spark.sql(f"""
+            SELECT tweet_id, idx
+            FROM tweets2
+            WHERE idx BETWEEN {start} AND {end}
+        """).toPandas()['tweet_id'])
+        start = end+1
+        end = start+99
+
+        response = client.request(
+            method="GET", 
+            route="/2/tweets", 
+            params={
+                # "ids": "1213330173736738817,1223120931377123329",
+                "ids": ids,
+                "tweet.fields": tweet_fields,
+                "expansions": expansions,
+                "media.fields": media_fields,
+                "place.fields": place_fields,
+                "poll.fields": poll_fields,
+                "user.fields": user_fields
+            }, 
+            user_auth=True
+        )
+        # write_pretty_json_to_file(response.json(), './output/test.json')
+        # print(response.json())
+        response_json = response.json()
+        write_pretty_json_to_file(response_json, f"./output/{str(count).zfill(9)}.json")
+        # if "data" in response_json:
+        #     write_json_to_csv(response_json["data"], "./output/data.csv")
+        # if "includes" in response_json:
+        #     write_json_to_csv(response_json["includes"], "./output/includes.csv")
+        # if "errors" in response_json:
+        #     write_json_to_csv(response_json["errors"], "./output/errors.csv")
+        # if "meta" in response_json:
+        #     write_json_to_csv(response_json["meta"], "./output/meta.csv")
+        count+=1

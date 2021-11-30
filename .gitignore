@@ -133,6 +133,7 @@ dmypy.json
 
 # Project data
 data/
+output/
 
 # Configs
 *config.yaml
