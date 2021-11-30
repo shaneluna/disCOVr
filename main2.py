@@ -1,5 +1,6 @@
 import tweepy
 from tweepy import poll
+from tweepy import place
 import yaml
 
 def read_yaml_config():
@@ -15,7 +16,7 @@ if __name__ == '__main__':
     access_token = config["twitter"]["oauth1.0a"]["access_token"]
     access_token_secret = config["twitter"]["oauth1.0a"]["access_token_secret"]
 
-    api = tweepy.Client(
+    client = tweepy.Client(
         bearer_token=bearer_token,
         consumer_key=consumer_key,
         consumer_secret=consumer_secret,
@@ -107,14 +108,30 @@ if __name__ == '__main__':
     ]
 
     # public_tweets = api.get_tweets(user_auth=True, ids=["1213330173736738817","1223120931377123329"])
-    public_tweets = api.get_tweets(
-        user_auth=True, 
-        ids=["1213330173736738817"], 
-        expansions=expansions, 
-        media_fields=media_fields, 
-        place_fields=place_fields,
-        poll_fields=poll_fields,
-        user_fields=user_fields,
-        tweet_fields=tweet_fields
+    # public_tweets = client.get_tweets(
+    #     user_auth=True, 
+    #     ids=["1213330173736738817"], 
+    #     expansions=expansions, 
+    #     media_fields=media_fields, 
+    #     place_fields=place_fields,
+    #     poll_fields=poll_fields,
+    #     user_fields=user_fields,
+    #     tweet_fields=tweet_fields
+    # )
+    # print(public_tweets)
+
+    tweets = client.request(
+        method="GET", 
+        route="/2/tweets", 
+        params={
+            "ids": "1213330173736738817",
+            "expansions": ",".join(expansions),
+            "media.fields": ",".join(media_fields),
+            "place.fields": ",".join(place_fields),
+            "poll.fields": ",".join(poll_fields),
+            "user.fields": ",".join(user_fields),
+            "tweet.fields": ",".join(tweet_fields)
+        }, 
+        user_auth=True
     )
-    print(public_tweets)
+    print(tweets.json())
