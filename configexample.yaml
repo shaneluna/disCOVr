@@ -7,3 +7,7 @@ twitter:
     access_token_secret: abcdefghijklmnopqrstuvwxyz
   oauth2.0:
     bearer_token: abcdefghijklmnopqrstuvwxyz
+neo4j:
+  uri: bolt://localhost:7687
+  user: neo4j
+  password: neo4j
