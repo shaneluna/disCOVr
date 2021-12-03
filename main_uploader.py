@@ -1,6 +1,7 @@
 from typing import Dict, List
 from py2neo import Graph
 from py2neo.bulk import create_nodes
+import utilities as util
 import yaml
 import glob
 import json
@@ -17,23 +18,76 @@ import json
 # Windows - <neo4j-home>/import
 # Debian / RPM - /var/lib/neo4j/import
 
-# To-Do: update output to import directory name
-
-def read_yaml_config():
-    with open("config.yaml", "r") as yamlfile:
-        config = yaml.safe_load(yamlfile)
-    return config
-
-def get_files(path: str, extension: str) -> List:
+def get_files(path: str, extension: str) -> list:
     return glob.glob(f"{path}*.{extension}")
 
-def read_json_file(filepath: str) -> Dict:
+def read_json_file(filepath: str) -> dict:
     with open(filepath) as json_file:
         json_dict = json.load(json_file)
     return json_dict
 
+def compress_folder(path: str) -> None:
+    pass
+
+def uncompress_folder(path: str) -> None:
+    pass
+
+def move_files_to_import(start_path: str, end_path: str) -> None:
+    # Compress
+    # Move and overwrite with simiar name
+    # Uncompress
+    pass
+
+def delete_files(path: str) -> None:
+    # Should be able to handle deleting single file, or whole folder with many files
+    pass
+
+def base_import():
+    pass
+
+##########
+# NODES
+##########
+
+def import_tweets():
+    pass
+
+def import_users():
+    pass
+
+def import_hashtags():
+    pass
+
+def import_twitter_topics():
+    pass
+
+##########
+# EDGES
+##########
+
+def import_posts():
+    pass
+
+def import_retweets():
+    pass
+
+def import_mentions():
+    pass
+
+def import_quotes():
+    pass
+
+def import_replies():
+    pass
+
+def import_tags():
+    pass
+
+def import_covers():
+    pass
+
 if __name__ == '__main__':
-    config = read_yaml_config()
+    config = util.read_yaml_config("config.yaml")
     uri = config["neo4j"]["uri"]
     user = config["neo4j"]["user"]
     password = config["neo4j"]["password"]
