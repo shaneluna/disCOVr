@@ -25,6 +25,7 @@ def score_bias(row):
     status = [response.status_code, response.json()['success']]
     title = [response.json()['title'].get(key) for key in keys]
     content = [response.json()['content'].get(key) for key in keys]
+    domain = response.json()['domain'].get('category')
     return pandas.Series({
         'news_id': news_id,
         'status_code': status[0],
@@ -32,7 +33,8 @@ def score_bias(row):
         'title_decision': title[0],
         'title_score': title[1],
         'content_decision': content[0],
-        'content_score': content[1]
+        'content_score': content[1],
+        'domain': domain
     })
 
 
