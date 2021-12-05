@@ -1,0 +1,15 @@
+version: "3.9"
+
+services:
+  fakebox:
+    image: machinebox/fakebox
+    container_name: fakebox
+    environment:
+      - MB_KEY=${MB_KEY}
+      - username=username
+      - password=password
+    ports:
+      - 8880:8080
+    restart: unless-stopped
+
+
