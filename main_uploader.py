@@ -1,5 +1,6 @@
 from typing import Dict, List
 from py2neo import Graph
+import py2neo
 from py2neo.bulk import create_nodes
 import utilities as util
 import tarfile
@@ -65,8 +66,26 @@ def delete_file(path: str) -> None:
 # Neo4j
 ##########
 
-def create_constraints():
-    pass
+def create_constraints(graph: Graph) -> None:
+    """
+    Create constraints and primary keys for graph database.
+    """
+    try:
+        graph.run("CREATE CONSTRAINT ON (tweet:Tweet) ASSERT tweet.tweet_id IS UNIQUE")
+    except py2neo.errors.ClientError:
+        pass
+    try: 
+        graph.run("CREATE CONSTRAINT ON (tweet:Tweet) ASSERT exists(tweet.tweet_id)")
+    except py2neo.errors.ClientError:
+        pass
+    try: 
+        graph.run("CREATE CONSTRAINT ON (user:User) ASSERT user.user_id IS UNIQUE")
+    except py2neo.errors.ClientError:
+        pass
+    try: 
+        graph.run("CREATE CONSTRAINT ON (user:User) ASSERT exists(user.user_id)")
+    except py2neo.errors.ClientError:
+        pass
 
 ##########
 # NODES
@@ -138,17 +157,26 @@ def import_twitter_topics():
 def import_posts():
     pass
 
-def import_retweets():
-    pass
-
-def import_mentions():
-    pass
-
-def import_quotes():
-    pass
-
-def import_replies():
-    pass
+def impoort_referenced():
+    """
+    Import refernced type edges between tweets to the graph database.
+    """
+    # retweets, mentions, quotes, replies
+    files = util.get_files("./raw/tweets/", "json")
+    for file in files:
+        query = f"""
+        WITH 'file:///{file}' AS url 
+        CALL apoc.load.json(url) YIELD value 
+        UNWIND value.data AS data
+        MERGE(t1: Tweet {{tweet_id: data.id}})
+        with data, t1
+        unwind data.referenced_tweets as ref_tweets
+        merge(t2: Tweet {tweet_id: ref_tweets.id})
+        with t1,t2,ref_tweets
+        CALL apoc.create.relationship(t1, ref_tweets.type,null, t2) yield rel
+        return t1, t2, rel
+        """
+        graph.run(query)
 
 def import_tags():
     pass
@@ -170,7 +198,9 @@ if __name__ == '__main__':
     # json_dict = read_json_file(tweet_files[0])
 
     graph = Graph(uri=uri, auth=(user, password))
-    import_users(graph)
+    create_constraints(graph)
+    # import_tweets(graph)
+    # import_users(graph)
 
     # movies = graph.run("MATCH (m:Movie) RETURN m")
     # data = json_dict['data']
