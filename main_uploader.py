@@ -98,7 +98,6 @@ def import_tweets(graph: Graph) -> None:
         RETURN t1, t2
         """
         graph.run(query)
-        break
 
 
 def import_users(graph: Graph) -> None: 
