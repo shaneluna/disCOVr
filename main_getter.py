@@ -147,7 +147,7 @@ if __name__ == '__main__':
     # )
     # print(public_tweets)
 
-    create_directory("./output")
+    create_directory("./raw")
 
     spark = SparkSession.builder \
     .master("local[*]") \
@@ -194,7 +194,7 @@ if __name__ == '__main__':
         # write_pretty_json_to_file(response.json(), './output/test.json')
         # print(response.json())
         response_json = response.json()
-        write_pretty_json_to_file(response_json, f"./output/{str(count).zfill(9)}.json")
+        write_pretty_json_to_file(response_json, f"./raw/{str(count).zfill(9)}.json")
         # if "data" in response_json:
         #     write_json_to_csv(response_json["data"], "./output/data.csv")
         # if "includes" in response_json:

@@ -2,8 +2,6 @@ from typing import Dict, List
 from py2neo import Graph
 from py2neo.bulk import create_nodes
 import utilities as util
-import glob
-import json
 import tarfile
 import shutil
 import os
@@ -20,29 +18,15 @@ import os
 # Windows - <neo4j-home>/import
 # Debian / RPM - /var/lib/neo4j/import
 
-def get_files(path: str, extension: str) -> list:
-    """
-    Return list of filepaths given search path and extension.
-    """
-    return glob.glob(f"{path}*.{extension}")
-
-def read_json_file(filepath: str) -> dict:
-    """
-    Return dictionary from json.
-    """
-    with open(filepath) as json_file:
-        json_dict = json.load(json_file)
-    return json_dict
-
-def compress_folder(path_to_folder: str) -> str:
+def compress_folder(path: str) -> str:
     """
     Compress folder using gzip into current directory.
     Return the name of new gzipped object.
     """
-    folder = str.split(path_to_folder, '/')[-1]
-    new_file = f"{folder}.tar.gz"
+    folder_name = os.path.basename(path)
+    new_file = f"{folder_name}.tar.gz"
     tar = tarfile.open(new_file, "w:gz")
-    tar.add(path_to_folder, arcname=folder)
+    tar.add(path, arcname=folder_name)
     tar.close()
     return new_file
 
@@ -51,8 +35,8 @@ def uncompress_folder(path: str) -> None:
     Uncompress gzipped folder.
     """
     tar = tarfile.open(path)
-    split = str.split(path, '/')
-    tar.extractall("/".join(split[0:len(split)-1])) # get filepath without the filename
+    dirname = os.path.dirname(path)
+    tar.extractall(dirname)
     tar.close()
 
 def move_files_to_import(start_path: str, end_path: str) -> None:
@@ -77,18 +61,64 @@ def delete_file(path: str) -> None:
     """
     os.remove(path)
 
-def base_import():
+##########
+# Neo4j
+##########
+
+def create_constraints():
     pass
 
 ##########
 # NODES
 ##########
 
-def import_tweets():
-    pass
+def import_tweets(graph: Graph) -> None:
+    """
+    Import tweet nodes to the graph database.
+    """
+    files = util.get_files("./raw/tweets/", "json")
+    for file in files:
+        query = f"""
+        WITH 'file:///{file}' AS url 
+        CALL apoc.load.json(url) YIELD value 
+        UNWIND value.data AS data
+        WITH data, value.includes as includes
+        UNWIND includes.tweets AS include_tweets
+        MERGE(t1: Tweet {{tweet_id: data.id}})
+        SET t1.text = data.text
+        SET t1.lang = data.lang
+        SET t1.created_at = data.created_at
+        SET t1.source = data.source
+        WITH data, t1, include_tweets
+        MERGE(t2: Tweet {{tweet_id: include_tweets.id}})
+        SET t2.text = include_tweets.text
+        SET t2.lang = include_tweets.lang
+        SET t2.created_at = include_tweets.created_at
+        SET t2.source = include_tweets.source
+        RETURN t1, t2
+        """
+        graph.run(query)
+        break
 
-def import_users():
-    pass
+
+def import_users(graph: Graph) -> None: 
+    """
+    Import user nodes to the graph database.
+    """
+    files = util.get_files("./raw/tweets/", "json")
+    for file in files:
+        query = f"""
+        WITH 'file:///{file}' AS url 
+        CALL apoc.load.json(url) YIELD value 
+        UNWIND value.data AS data
+        WITH data, value.includes AS includes
+        UNWIND includes.users AS include_users
+        MERGE (u1: User {{user_id: include_users.id}})
+        SET u1.username = include_users.username
+        SET u1.name = include_users.name 
+        """
+        graph.run(query)
+        break
 
 def import_hashtags():
     pass
@@ -127,33 +157,18 @@ if __name__ == '__main__':
     user = config["neo4j"]["user"]
     password = config["neo4j"]["password"]
 
-    neo4j_import_location = "/Users/lunez/Library/Application Support/Neo4j Desktop/Application/relate-data/dbmss/dbms-4374ec2b-7704-4595-a764-596a0e2fe227/import"
-    move_files_to_import("./output", neo4j_import_location)
+    # neo4j_import_location = "/Users/lunez/Library/Application Support/Neo4j Desktop/Application/relate-data/dbmss/dbms-4374ec2b-7704-4595-a764-596a0e2fe227/import"
+    # move_files_to_import("./raw", neo4j_import_location)
 
     # tweet_files = get_files("./output/000000000", "json")
     # print(tweet_files[0])
     # json_dict = read_json_file(tweet_files[0])
 
-    # graph = Graph(uri=uri, auth=(user, password))
+    graph = Graph(uri=uri, auth=(user, password))
+    import_tweets(graph)
+
     # movies = graph.run("MATCH (m:Movie) RETURN m")
     # data = json_dict['data']
     # print(len(data))
     # create_nodes(graph.auto(), data, labels={"Tweet"})
-
-
-    # query = """
-    # WITH 'file:///000000000.json' as url 
-    # CALL apoc.load.json(url) YIELD value 
-    # unwind value.data as data
-    # with data, value.includes as includes
-    # unwind includes.tweets as include_tweets
-    # merge(t1: Tweet {tweet_id: data.id})
-    # set t1.text = data.text
-    # with data, t1, include_tweets
-    # merge(t2: Tweet {tweet_id: include_tweets.id})
-    # set t2.text = include_tweets.text
-    # return t1, t2
-    # """
-    # graph.run(query)
-    # print(graph.nodes.match("Tweet").count())
     
