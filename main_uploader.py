@@ -95,7 +95,6 @@ def import_tweets(graph: Graph) -> None:
         SET t2.lang = include_tweets.lang
         SET t2.created_at = include_tweets.created_at
         SET t2.source = include_tweets.source
-        RETURN t1, t2
         """
         graph.run(query)
 
