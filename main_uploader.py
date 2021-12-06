@@ -110,14 +110,21 @@ def import_users(graph: Graph) -> None:
         WITH 'file:///{file}' AS url 
         CALL apoc.load.json(url) YIELD value 
         UNWIND value.data AS data
-        WITH data, value.includes AS includes
-        UNWIND includes.users AS include_users
+        WITH data, value.includes as includes
+        UNWIND includes.users as include_users
         MERGE (u1: User {{user_id: include_users.id}})
         SET u1.username = include_users.username
-        SET u1.name = include_users.name 
+        SET u1.name = include_users.name
+        SET u1.description = include_users.description
+        SET u1.location = include_users.location
+        SET u1.created_at = include_users.created_at
+        SET u1.verified = include_users.verified
+        SET u1.public_metrics_followers_count = include_users.public_metrics.followers_count
+        SET u1.public_metrics_following_count = include_users.public_metrics.following_count
+        SET u1.public_metrics_tweet_count = include_users.public_metrics.tweet_count
+        SET u1.public_metrics_listed_count = include_users.public_metrics.listed_count
         """
         graph.run(query)
-        break
 
 def import_hashtags():
     pass
@@ -164,7 +171,7 @@ if __name__ == '__main__':
     # json_dict = read_json_file(tweet_files[0])
 
     graph = Graph(uri=uri, auth=(user, password))
-    import_tweets(graph)
+    import_users(graph)
 
     # movies = graph.run("MATCH (m:Movie) RETURN m")
     # data = json_dict['data']
