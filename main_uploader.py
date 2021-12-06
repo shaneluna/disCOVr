@@ -104,13 +104,13 @@ def import_tweets(graph: Graph) -> None:
         UNWIND value.data AS data
         WITH data, value.includes as includes
         UNWIND includes.tweets AS include_tweets
-        MERGE(t1: Tweet {{tweet_id: data.id}})
+        MERGE (t1: Tweet {{tweet_id: data.id}})
         SET t1.text = data.text
         SET t1.lang = data.lang
         SET t1.created_at = data.created_at
         SET t1.source = data.source
         WITH data, t1, include_tweets
-        MERGE(t2: Tweet {{tweet_id: include_tweets.id}})
+        MERGE (t2: Tweet {{tweet_id: include_tweets.id}})
         SET t2.text = include_tweets.text
         SET t2.lang = include_tweets.lang
         SET t2.created_at = include_tweets.created_at
@@ -155,8 +155,26 @@ def import_twitter_topics():
 # EDGES
 ##########
 
-def import_posts():
-    pass
+def import_tweeted(graph: Graph) -> None:
+    """
+    Import post edges between tweets and users to the graph database.
+    """
+    files = util.get_files("./raw/tweets/", "json")
+    for file in files:
+        query = f"""
+        WITH 'file:///{file}' AS url 
+        CALL apoc.load.json(url) YIELD value 
+        UNWIND value.data AS data
+        WITH data, value.includes as includes
+        UNWIND includes.tweets as include_tweets
+        MERGE (u1:User {{user_id: data.author_id}})
+        MERGE (t1:Tweet {{tweet_id: data.id}})
+        MERGE (u1)-[:tweeted]->(t1)
+        MERGE (u2: User {{user_id: include_tweets.author_id}})
+        MERGE (t2: Tweet {{tweet_id: include_tweets.id}})
+        MERGE (u2)-[:tweeted]->(t2)
+        """
+        graph.run(query)
 
 def import_referenced(graph: Graph) -> None:
     """
@@ -172,9 +190,9 @@ def import_referenced(graph: Graph) -> None:
         MERGE(t1: Tweet {{tweet_id: data.id}})
         WITH data, t1
         UNWIND data.referenced_tweets AS ref_tweets
-        MERGE(t2: Tweet {{tweet_id: ref_tweets.id}})
+        MERGE (t2: Tweet {{tweet_id: ref_tweets.id}})
         WITH t1,t2,ref_tweets
-        CALL apoc.create.relationship(t1, ref_tweets.type,null, t2) YIELD rel
+        CALL apoc.create.relationship(t1, ref_tweets.type, null, t2) YIELD rel
         RETURN t1, t2, rel
         """
         graph.run(query)
@@ -203,7 +221,9 @@ if __name__ == '__main__':
     # create_constraints(graph)
     start = time.time()
     # import_tweets(graph)
-    import_referenced(graph)
+    # import_users(graph)
+    # import_referenced(graph)
+    import_tweeted(graph)
     print(time.time()-start)
     # import_users(graph)
 
