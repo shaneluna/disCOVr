@@ -6,6 +6,7 @@ import utilities as util
 import tarfile
 import shutil
 import os
+import time
 
 # Follow for apoc: https://neo4j.com/developer/neo4j-apoc/
 # Select db from neo4j desktop > plugins on right > apoc > install and restart
@@ -157,7 +158,7 @@ def import_twitter_topics():
 def import_posts():
     pass
 
-def import_referenced():
+def import_referenced(graph: Graph) -> None:
     """
     Import refernced type edges between tweets to the graph database.
     """
@@ -173,9 +174,11 @@ def import_referenced():
         UNWIND data.referenced_tweets AS ref_tweets
         MERGE(t2: Tweet {{tweet_id: ref_tweets.id}})
         WITH t1,t2,ref_tweets
-        CALL apoc.create.relationship(t1, ref_tweets.type,null, t2) yield rel
+        CALL apoc.create.relationship(t1, ref_tweets.type,null, t2) YIELD rel
+        RETURN t1, t2, rel
         """
         graph.run(query)
+        
 
 def import_tags():
     pass
@@ -197,8 +200,11 @@ if __name__ == '__main__':
     # json_dict = read_json_file(tweet_files[0])
 
     graph = Graph(uri=uri, auth=(user, password))
-    create_constraints(graph)
+    # create_constraints(graph)
+    start = time.time()
     # import_tweets(graph)
+    import_referenced(graph)
+    print(time.time()-start)
     # import_users(graph)
 
     # movies = graph.run("MATCH (m:Movie) RETURN m")
