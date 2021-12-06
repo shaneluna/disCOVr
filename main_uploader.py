@@ -157,7 +157,7 @@ def import_twitter_topics():
 def import_posts():
     pass
 
-def impoort_referenced():
+def import_referenced():
     """
     Import refernced type edges between tweets to the graph database.
     """
@@ -169,12 +169,11 @@ def impoort_referenced():
         CALL apoc.load.json(url) YIELD value 
         UNWIND value.data AS data
         MERGE(t1: Tweet {{tweet_id: data.id}})
-        with data, t1
-        unwind data.referenced_tweets as ref_tweets
-        merge(t2: Tweet {tweet_id: ref_tweets.id})
-        with t1,t2,ref_tweets
+        WITH data, t1
+        UNWIND data.referenced_tweets AS ref_tweets
+        MERGE(t2: Tweet {{tweet_id: ref_tweets.id}})
+        WITH t1,t2,ref_tweets
         CALL apoc.create.relationship(t1, ref_tweets.type,null, t2) yield rel
-        return t1, t2, rel
         """
         graph.run(query)
 
