@@ -157,7 +157,7 @@ def import_twitter_topics():
 
 def import_tweeted(graph: Graph) -> None:
     """
-    Import post edges between tweets and users to the graph database.
+    Import tweeted edges between tweets and users to the graph database.
     """
     files = util.get_files("./raw/tweets/", "json")
     for file in files:
@@ -178,9 +178,9 @@ def import_tweeted(graph: Graph) -> None:
 
 def import_referenced(graph: Graph) -> None:
     """
-    Import refernced type edges between tweets to the graph database.
+    Import referenced type edges between tweets to the graph database.
     """
-    # retweets, mentions, quotes, replies
+    # retweeted, quoted, replied_to
     files = util.get_files("./raw/tweets/", "json")
     for file in files:
         query = f"""
@@ -198,8 +198,22 @@ def import_referenced(graph: Graph) -> None:
         graph.run(query)
         
 
-def import_tags():
-    pass
+def import_mentioned(graph: Graph) -> None:
+    """
+    Import mentioned edges between tweets and users to the graph database.
+    """
+    files = util.get_files("./raw/tweets/", "json")
+    for file in files:
+        query = f"""
+        WITH 'file:///{file}' AS url 
+        CALL apoc.load.json(url) YIELD value 
+        UNWIND value.data AS data
+        UNWIND data.entities.mentions AS mentions
+        MERGE (t1: Tweet {{tweet_id: data.id}})
+        MERGE (u1: User {{user_id: mentions.id}})
+        MERGE (t1) -[:mentioned]->(u1)
+        """
+        graph.run(query)
 
 def import_covers():
     pass
@@ -223,7 +237,8 @@ if __name__ == '__main__':
     # import_tweets(graph)
     # import_users(graph)
     # import_referenced(graph)
-    import_tweeted(graph)
+    # import_tweeted(graph)
+    import_mentioned(graph)
     print(time.time()-start)
     # import_users(graph)
 
