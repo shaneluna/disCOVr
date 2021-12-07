@@ -115,6 +115,16 @@ def create_constraints(graph: Graph) -> None:
     #     pass
 
 
+    try: 
+        graph.run("CREATE CONSTRAINT ON (category:Category) ASSERT category.name IS UNIQUE")
+    except py2neo.errors.ClientError:
+        pass
+    try: 
+        graph.run("CREATE CONSTRAINT ON (category:Category) ASSERT exists(category.name)")
+    except py2neo.errors.ClientError:
+        pass
+
+
 ##########
 # NODES
 ##########
@@ -324,6 +334,17 @@ def import_bias(graph: Graph) -> None:
     """
     graph.run(query)
 
+def import_categories(graph: Graph) -> None:
+    """
+    Import categories for articles to the graph database.
+    """
+    query = f"""
+    LOAD CSV WITH HEADERS FROM 'file:///data/news_topics/news_categories.csv' AS row
+    MERGE (c:Category {{name: row.category}} )
+    RETURN c
+    """
+    graph.run(query)
+
 if __name__ == '__main__':
     config = util.read_yaml_config("config.yaml")
     uri = config["neo4j"]["uri"]
@@ -350,6 +371,7 @@ if __name__ == '__main__':
     # import_articles(graph)
     # import_cited(graph)
     # import_bias(graph)
+    import_categories(graph)
 
     print(time.time()-start)
 
