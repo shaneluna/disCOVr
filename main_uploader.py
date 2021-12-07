@@ -132,16 +132,24 @@ def import_tweets(graph: Graph) -> None:
         WITH data, value.includes as includes
         UNWIND includes.tweets AS include_tweets
         MERGE (t1: Tweet {{tweet_id: data.id}})
-        SET t1.text = data.text
-        SET t1.lang = data.lang
-        SET t1.created_at = data.created_at
-        SET t1.source = data.source
+        SET t1.text = data.text,
+        t1.lang = data.lang,
+        t1.created_at = data.created_at,
+        t1.source = data.source,
+        t1.public_metrics_retweet_count = data.public_metrics.retweet_count,
+        t1.public_metrics_reply_count = data.public_metrics.reply_count,
+        t1.public_metrics_like_count = data.public_metrics.like_count,
+        t1.public_metrics_like_count = data.public_metrics.like_count
         WITH data, t1, include_tweets
         MERGE (t2: Tweet {{tweet_id: include_tweets.id}})
-        SET t2.text = include_tweets.text
-        SET t2.lang = include_tweets.lang
-        SET t2.created_at = include_tweets.created_at
-        SET t2.source = include_tweets.source
+        SET t2.text = include_tweets.text,
+        t2.lang = include_tweets.lang,
+        t2.created_at = include_tweets.created_at,
+        t2.source = include_tweets.source,
+        t2.public_metrics_retweet_count = data.public_metrics.retweet_count,
+        t2.public_metrics_reply_count = data.public_metrics.reply_count,
+        t2.public_metrics_like_count = data.public_metrics.like_count,
+        t2.public_metrics_like_count = data.public_metrics.like_count
         """
         graph.run(query)
 
