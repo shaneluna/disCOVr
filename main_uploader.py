@@ -300,6 +300,22 @@ def import_cited(graph: Graph) -> None:
     """
     graph.run(query)
 
+def import_bias(graph: Graph) -> None:
+    """
+    Import bias for articles to the graph database.
+    """
+    query = f"""
+    LOAD CSV WITH HEADERS FROM 'file:///data/news_biases/news_biases.csv' AS row
+    MERGE (a:Article {{article_id: row.news_id}})
+    SET a.bias_title_decision = row.title_decision,
+    a.bias_title_score = row.title_score,
+    a.bias_content_decision = row.content_decision,
+    a.bias_content_score = row.content_score,
+    a.bias_domain = row.domain
+    RETURN a
+    """
+    graph.run(query)
+
 if __name__ == '__main__':
     config = util.read_yaml_config("config.yaml")
     uri = config["neo4j"]["uri"]
@@ -324,7 +340,8 @@ if __name__ == '__main__':
 
     # ARTICLE NODES #
     # import_articles(graph)
-    import_cited(graph)
+    # import_cited(graph)
+    # import_bias(graph)
 
     print(time.time()-start)
 
