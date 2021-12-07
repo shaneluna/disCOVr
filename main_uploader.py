@@ -336,12 +336,24 @@ def import_bias(graph: Graph) -> None:
 
 def import_categories(graph: Graph) -> None:
     """
-    Import categories for articles to the graph database.
+    Import categories to the graph database.
     """
     query = f"""
     LOAD CSV WITH HEADERS FROM 'file:///data/news_topics/news_categories.csv' AS row
     MERGE (c:Category {{name: row.category}} )
     RETURN c
+    """
+    graph.run(query)
+
+def import_categories_relationship(graph: Graph) -> None:
+    """
+    Import category relationships for articles to the graph database.
+    """
+    query = f"""
+    LOAD CSV WITH HEADERS FROM 'file:///data/news_topics/news_categories.csv' AS row
+    MERGE (a:Article {{article_id: row.news_id}})
+    MERGE (c:Category {{name: row.category}})
+    MERGE (a)-[:associated_with]->(c)
     """
     graph.run(query)
 
@@ -371,7 +383,8 @@ if __name__ == '__main__':
     # import_articles(graph)
     # import_cited(graph)
     # import_bias(graph)
-    import_categories(graph)
+    # import_categories(graph)
+    # import_categories_relationship(graph)
 
     print(time.time()-start)
 
