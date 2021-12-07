@@ -79,12 +79,24 @@ def create_constraints(graph: Graph) -> None:
         graph.run("CREATE CONSTRAINT ON (tweet:Tweet) ASSERT exists(tweet.tweet_id)")
     except py2neo.errors.ClientError:
         pass
+
+
     try: 
         graph.run("CREATE CONSTRAINT ON (user:User) ASSERT user.user_id IS UNIQUE")
     except py2neo.errors.ClientError:
         pass
     try: 
         graph.run("CREATE CONSTRAINT ON (user:User) ASSERT exists(user.user_id)")
+    except py2neo.errors.ClientError:
+        pass
+
+
+    try: 
+        graph.run("CREATE CONSTRAINT ON (twitter_topic:Twitter_Topic) ASSERT twitter_topic.twitter_topic_id IS UNIQUE")
+    except py2neo.errors.ClientError:
+        pass
+    try: 
+        graph.run("CREATE CONSTRAINT ON (twitter_topic:Twitter_Topic) ASSERT exists(twitter_topic.twitter_topic_id)")
     except py2neo.errors.ClientError:
         pass
 
@@ -148,8 +160,28 @@ def import_users(graph: Graph) -> None:
 def import_hashtags():
     pass
 
-def import_twitter_topics():
-    pass
+def import_twitter_topics(graph: Graph) -> None:
+    """
+    Import twitter context annotations and their relationship for tweets.
+    """
+    files = util.get_files("./raw/tweets/", "json")
+    for file in files:
+        query = f"""
+        WITH 'file:///{file}' AS url 
+        CALL apoc.load.json(url) YIELD value 
+        UNWIND value.data AS data
+        MERGE (t1: Tweet {{tweet_id:data.id}})
+        WITH t1, data.context_annotations as context_annotations
+        UNWIND context_annotations as context_annotation
+        MERGE (tt:Twitter_Topic {{twitter_topic_id: context_annotation.entity.id}})
+        SET tt.name = context_annotation.entity.name
+        SET tt.description = context_annotation.entity.description
+        SET tt.domain_id = context_annotation.domain.id
+        SET tt.domain_name = context_annotation.domain.name
+        SET tt.domain_description = context_annotation.domain.description
+        MERGE (t1)-[:associated_with]->(tt)
+        """
+        graph.run(query)
 
 ##########
 # EDGES
@@ -211,7 +243,7 @@ def import_mentioned(graph: Graph) -> None:
         UNWIND data.entities.mentions AS mentions
         MERGE (t1: Tweet {{tweet_id: data.id}})
         MERGE (u1: User {{user_id: mentions.id}})
-        MERGE (t1) -[:mentioned]->(u1)
+        MERGE (t1)-[:mentioned]->(u1)
         """
         graph.run(query)
 
@@ -238,7 +270,8 @@ if __name__ == '__main__':
     # import_users(graph)
     # import_referenced(graph)
     # import_tweeted(graph)
-    import_mentioned(graph)
+    # import_mentioned(graph)
+    # import_twitter_topics(graph)
     print(time.time()-start)
     # import_users(graph)
 
