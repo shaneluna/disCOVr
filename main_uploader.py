@@ -288,6 +288,17 @@ def import_articles(graph: Graph) -> None:
     """
     graph.run(query)
 
+def import_cited(graph: Graph) -> None:
+    """
+    Import cited relation for tweets and articles to the graph database.
+    """
+    query = f"""
+    LOAD CSV WITH HEADERS FROM 'file:///data/reCOVery/recovery-social-media-data.txt' AS row
+    MATCH (t:Tweet {{tweet_id: row.tweet_id}})
+    MATCH (a:Article {{article_id: row.news_id}})
+    MERGE (t)-[:cited]->(a)
+    """
+    graph.run(query)
 
 if __name__ == '__main__':
     config = util.read_yaml_config("config.yaml")
@@ -313,6 +324,7 @@ if __name__ == '__main__':
 
     # ARTICLE NODES #
     # import_articles(graph)
+    import_cited(graph)
 
     print(time.time()-start)
 
