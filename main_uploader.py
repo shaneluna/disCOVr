@@ -100,6 +100,21 @@ def create_constraints(graph: Graph) -> None:
     except py2neo.errors.ClientError:
         pass
 
+    try: 
+        graph.run("CREATE CONSTRAINT ON (article:Article) ASSERT article.article_id IS UNIQUE")
+    except py2neo.errors.ClientError:
+        pass
+    try: 
+        graph.run("CREATE CONSTRAINT ON (article:Article) ASSERT exists(article.article_id)")
+    except py2neo.errors.ClientError:
+        pass
+    # Removing until dup urls removed from articles
+    # try: 
+    #     graph.run("CREATE CONSTRAINT ON (article:Article) ASSERT article.url IS UNIQUE")
+    # except py2neo.errors.ClientError:
+    #     pass
+
+
 ##########
 # NODES
 ##########
@@ -108,7 +123,7 @@ def import_tweets(graph: Graph) -> None:
     """
     Import tweet nodes to the graph database.
     """
-    files = util.get_files("./raw/tweets/", "json")
+    files = util.get_files("./data/tweets/", "json")
     for file in files:
         query = f"""
         WITH 'file:///{file}' AS url 
@@ -135,7 +150,7 @@ def import_users(graph: Graph) -> None:
     """
     Import user nodes to the graph database.
     """
-    files = util.get_files("./raw/tweets/", "json")
+    files = util.get_files("./data/tweets/", "json")
     for file in files:
         query = f"""
         WITH 'file:///{file}' AS url 
@@ -164,7 +179,7 @@ def import_twitter_topics(graph: Graph) -> None:
     """
     Import twitter context annotations and their relationship for tweets.
     """
-    files = util.get_files("./raw/tweets/", "json")
+    files = util.get_files("./data/tweets/", "json")
     for file in files:
         query = f"""
         WITH 'file:///{file}' AS url 
@@ -191,7 +206,7 @@ def import_tweeted(graph: Graph) -> None:
     """
     Import tweeted edges between tweets and users to the graph database.
     """
-    files = util.get_files("./raw/tweets/", "json")
+    files = util.get_files("./data/tweets/", "json")
     for file in files:
         query = f"""
         WITH 'file:///{file}' AS url 
@@ -213,7 +228,7 @@ def import_referenced(graph: Graph) -> None:
     Import referenced type edges between tweets to the graph database.
     """
     # retweeted, quoted, replied_to
-    files = util.get_files("./raw/tweets/", "json")
+    files = util.get_files("./data/tweets/", "json")
     for file in files:
         query = f"""
         WITH 'file:///{file}' AS url 
@@ -234,7 +249,7 @@ def import_mentioned(graph: Graph) -> None:
     """
     Import mentioned edges between tweets and users to the graph database.
     """
-    files = util.get_files("./raw/tweets/", "json")
+    files = util.get_files("./data/tweets/", "json")
     for file in files:
         query = f"""
         WITH 'file:///{file}' AS url 
@@ -250,6 +265,30 @@ def import_mentioned(graph: Graph) -> None:
 def import_covers():
     pass
 
+##########
+# Article stuff
+##########
+
+# Known dups in articles
+# Removing constraint on url until cleaned
+def import_articles(graph: Graph) -> None:
+    """
+    Import artcile nodes to the graph database.
+    """
+    query = f"""
+    LOAD CSV WITH HEADERS FROM 'file:///data/reCOVery/recovery-news-data.csv' AS row
+    MERGE (a:Article {{article_id: row.news_id}})
+    SET a.url = row.url, 
+    a.publisher = row.publisher, 
+    a.publish_date = row.publish_date, 
+    a.author = row.author,
+    a.title = row.title,
+    a.body_text = row.body_text
+    RETURN a
+    """
+    graph.run(query)
+
+
 if __name__ == '__main__':
     config = util.read_yaml_config("config.yaml")
     uri = config["neo4j"]["uri"]
@@ -257,23 +296,25 @@ if __name__ == '__main__':
     password = config["neo4j"]["password"]
 
     # neo4j_import_location = "/Users/lunez/Library/Application Support/Neo4j Desktop/Application/relate-data/dbmss/dbms-4374ec2b-7704-4595-a764-596a0e2fe227/import"
-    # move_files_to_import("./raw", neo4j_import_location)
-
-    # tweet_files = get_files("./output/000000000", "json")
-    # print(tweet_files[0])
-    # json_dict = read_json_file(tweet_files[0])
+    # move_files_to_import("./data", neo4j_import_location)
 
     graph = Graph(uri=uri, auth=(user, password))
-    # create_constraints(graph)
+    create_constraints(graph)
+
     start = time.time()
+
+    # TWITTER NODES #
     # import_tweets(graph)
     # import_users(graph)
     # import_referenced(graph)
     # import_tweeted(graph)
     # import_mentioned(graph)
     # import_twitter_topics(graph)
+
+    # ARTICLE NODES #
+    # import_articles(graph)
+
     print(time.time()-start)
-    # import_users(graph)
 
     # movies = graph.run("MATCH (m:Movie) RETURN m")
     # data = json_dict['data']

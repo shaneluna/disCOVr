@@ -191,18 +191,18 @@ if __name__ == '__main__':
             }, 
             user_auth=True
         )
-        # write_pretty_json_to_file(response.json(), './output/test.json')
+        # write_pretty_json_to_file(response.json(), './raw/tweets/test.json')
         # print(response.json())
         response_json = response.json()
-        write_pretty_json_to_file(response_json, f"./raw/{str(count).zfill(9)}.json")
+        write_pretty_json_to_file(response_json, f"./raw/tweets/{str(count).zfill(9)}.json")
         # if "data" in response_json:
-        #     write_json_to_csv(response_json["data"], "./output/data.csv")
+        #     write_json_to_csv(response_json["data"], "./raw/tweets/data.csv")
         # if "includes" in response_json:
-        #     write_json_to_csv(response_json["includes"], "./output/includes.csv")
+        #     write_json_to_csv(response_json["includes"], "./raw/tweets/includes.csv")
         # if "errors" in response_json:
-        #     write_json_to_csv(response_json["errors"], "./output/errors.csv")
+        #     write_json_to_csv(response_json["errors"], "./raw/tweets/errors.csv")
         # if "meta" in response_json:
-        #     write_json_to_csv(response_json["meta"], "./output/meta.csv")
+        #     write_json_to_csv(response_json["meta"], "./raw/tweets/meta.csv")
         count+=1
     
     print("--- %s seconds ---" % (time.time() - start_time))
