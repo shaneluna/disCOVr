@@ -1,5 +1,10 @@
 # disCOVr
 
+## Relevant Links
+- Fakebox [API](https://machinebox.io/docs/fakebox) / [Docker Image](https://hub.docker.com/r/machinebox/fakebox)
+- [Google Cloud Natural Language API](https://cloud.google.com/natural-language/)
+- [Twitter API](https://developer.twitter.com/en/docs/twitter-api) 
+
 ## Data
 - [ReCOVery](https://github.com/apurvamulay/ReCOVery)
 
