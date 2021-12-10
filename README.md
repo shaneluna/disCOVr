@@ -4,7 +4,7 @@ This project was created to analyze misinformation on Twitter regarding COVID-19
 
 
 ## Relevant Links
-- Fakebox [API](https://machinebox.io/docs/fakebox) / [Docker Image](https://hub.docker.com/r/machinebox/fakebox)
+- Fakebox [Docs](https://machinebox.io/docs/fakebox) / [Docker Image](https://hub.docker.com/r/machinebox/fakebox)
 - [Google Cloud Natural Language API](https://cloud.google.com/natural-language/)
 - [Twitter API](https://developer.twitter.com/en/docs/twitter-api) 
 
@@ -30,7 +30,7 @@ The ReCOVery dataset is the springboard for the remainder of our project. Tweets
 
 6. Run each of the cells in the `GoogleAPI.ipynb` notebook. The output will be 3 csv files in the `data\news_topics` folder: `news_categories.csv`, `news_entities.csv`, and `news_sentiments.csv`. 
 
-7. Run each of the cells in the `FakeboxAPI.ipynb` notebook. The notebook connects to a self-hosted Docker container that runs the bias detection model. Use `docker/docker-compose.yml` for configuration,though this will require manual authentication credential changes. The output will be the `news_biases.csv` file in the `data\news_biases` folder. The entire run takes north of five hours, so plan accordingly. 
+7. Run each of the cells in the `FakeboxAPI.ipynb` notebook. The notebook connects to a self-hosted Docker container that runs the bias detection model. Use `docker/docker-compose.yml` for configuration,though this will require use of a `docker/.env` to load in an authentication key. Remove 'example' from the name of the `docker/example.env` file, and add in Machinebox-specific MB key string. The output will be the `news_biases.csv` file in the `data\news_biases` folder. The entire run takes north of five hours, so plan accordingly.
 
 8. Run each of the cells in the `Neo4jImporter.ipynb` notebook. This notebook will automate the data import process for Neo4j. The data in the json files and the csv files generated in the previous steps will be parsed and loaded into Neo4j.<br>
 Be sure to read the Notes section at the top of the `Neo4jImporter.ipynb` notebook for properly installing and setting up APOC for your Neo4j installation. The assumption is that the Neo4j Desktop Application has already been installed on the user's machine. Below are the same notes for immediate reference. 
