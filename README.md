@@ -12,7 +12,7 @@ The ReCOVery dataset is the springboard for the remainder of our project. Tweets
 2. It's recommended to create and activate a new python env; install the requirements.txt in your python environment.<br>
 `pip install -r requirements.txt`
 
-3. In the `secrets` folder,  create copies of the `configexample.yaml` and `discovr-2021-c63b2ee5e9f6example.json` files, rename to `config.yaml` and `discovr-2021-c63b2ee5e9f6.json`, respectively, and update each of the files with your personal config info. `config.yaml` will contain Twitter API config info. `discovr-2021-c63b2ee5e9f6example.json` will contain Google API config info. 
+3. In the `secrets` folder,  create copies of the `configexample.yaml` and `discovr-2021-c63b2ee5e9f6example.json` files, rename to `config.yaml` and `discovr-2021-c63b2ee5e9f6.json`, respectively, and update each of the files with your personal config info. `config.yaml` will contain Twitter API and Neo4j config info. `discovr-2021-c63b2ee5e9f6example.json` will contain Google API config info. 
 
 4. Download both csv files located at path ['ReCOVery/dataset'](https://github.com/apurvamulay/ReCOVery/tree/master/dataset) of the ReCOVery GitHub repository and store in path `data/reCOVery` of the disCOVr repo.
 
