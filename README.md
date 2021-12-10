@@ -1,14 +1,19 @@
 # disCOVr
 
+This project was created to analyze misinformation on Twitter regarding COVID-19. The objective is to create a Neo4j graph database with relevant data for querying and analysis.
+
+
 ## Relevant Links
 - Fakebox [API](https://machinebox.io/docs/fakebox) / [Docker Image](https://hub.docker.com/r/machinebox/fakebox)
 - [Google Cloud Natural Language API](https://cloud.google.com/natural-language/)
 - [Twitter API](https://developer.twitter.com/en/docs/twitter-api) 
 
+
 ## Data
 - [ReCOVery](https://github.com/apurvamulay/ReCOVery)
 
 The ReCOVery dataset is the springboard for the remainder of our project. Tweets and articles that are referenced or used later on in this project all stem from here. Transformations (via APIs) are applied to the tweet ids and article text / metadata to then generate additional properties and datasets.
+
 
 ## Getting Started
 
@@ -25,7 +30,7 @@ The ReCOVery dataset is the springboard for the remainder of our project. Tweets
 
 6. Run each of the cells in the `GoogleAPI.ipynb` notebook. The output will be 3 csv files in the `data\news_topics` folder: `news_categories.csv`, `news_entities.csv`, and `news_sentiments.csv`. 
 
-7. Run each of the cells in the `FakeboxAPI.ipynb` notebook. The notebook connects to a self-hosted Docker container that runs the bias detection model. The output will be the `news_biases.csv` file in the `data\news_biases` folder. The entire run takes north of five hours, so plan accordingly. 
+7. Run each of the cells in the `FakeboxAPI.ipynb` notebook. The notebook connects to a self-hosted Docker container that runs the bias detection model. Use `docker/docker-compose.yml` for configuration,though this will require manual authentication credential changes. The output will be the `news_biases.csv` file in the `data\news_biases` folder. The entire run takes north of five hours, so plan accordingly. 
 
 8. Run each of the cells in the `Neo4jImporter.ipynb` notebook. This notebook will automate the data import process for Neo4j. The data in the json files and the csv files generated in the previous steps will be parsed and loaded into Neo4j.<br>
 Be sure to read the Notes section at the top of the `Neo4jImporter.ipynb` notebook for properly installing and setting up APOC for your Neo4j installation. The assumption is that the Neo4j Desktop Application has already been installed on the user's machine. Below are the same notes for immediate reference. 
@@ -42,6 +47,4 @@ Be sure to read the Notes section at the top of the `Neo4jImporter.ipynb` notebo
 	- Debian / RPM - /var/lib/neo4j/import<br>
 
 	If desired, you can modify acceptable import locations.
-
-	### Additional Notes
-	If the user is using a Docker container, the user can use `docker/docker-compose.yml` for configuration. The personal config alterations will need to be made to the `docker-compose.yml`
+	
