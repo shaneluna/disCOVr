@@ -38,3 +38,5 @@ Be sure to read the Notes section at the top of the `Neo4jImporter.ipynb` notebo
 
 	If desired, you can modify acceptable import locations.
 
+##Additional Notes
+If the user is using a Docker container, the user can use `docker/docker-compose.yml` for configuration. The personal config alterations will need to be made to the `docker-compose.yml`
