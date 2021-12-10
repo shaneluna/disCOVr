@@ -20,7 +20,7 @@ The ReCOVery dataset is the springboard for the remainder of our project. Tweets
 
 6. Run each of the cells in the `GoogleAPI.ipynb` notebook. The output will be 3 csv files in the `data\news_topics` folder: `news_categories.csv`, `news_entities.csv`, and `news_sentiments.csv`. 
 
-7. Run each of the cells in the `FakeboxAPI.ipynb` notebook. The outpull will be the `news_biases.csv` file in the `data\news_biases` folder. 
+7. Run each of the cells in the `FakeboxAPI.ipynb` notebook. The output will be the `news_biases.csv` file in the `data\news_biases` folder. 
 
 8. Run each of the cells in the `Neo4jImporter.ipynb` notebook. This notebook will automate the data import process for Neo4j. The data in the json files and the csv files generated in the previous steps will be parsed and loaded into Neo4j.<br>
 Be sure to read the Notes section at the top of the `Neo4jImporter.ipynb` notebook for properly installing and setting up APOC for your Neo4j installation. The assumption is that the Neo4j Desktop Application has already been installed on the user's machine. Below are the same notes for immediate reference. 
