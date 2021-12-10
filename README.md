@@ -1,18 +1,19 @@
 # disCOVr
 
 ## Data
-- [COVID-19 Twitter Chatter dataset](https://zenodo.org/record/5701438#.YZSXxi-B0kg) (IGNORE)
 - [ReCOVery](https://github.com/apurvamulay/ReCOVery)
+
+The ReCOVery dataset is the springboard for the remainder of our project. Tweets and articles that are referenced or used later on in this project all stem from here. Transformations (via APIs) are applied to the tweet ids and article text / metadata to then generate additional properties and datasets.
 
 ## Getting Started
 
-1. PLACEHOLDER FOR DATA INSTRUCTIONS
+1. PySpark will require Java 8 or later with the JAVA_HOME variable set. Download and install Java if missing.
 
-i.e. Download the Twitter Chatter dataset (full_dataset.tsv.gz). Move the file to the `/data` folder and unzip.
-
-2. PySpark will require Java 8 or later with the JAVA_HOME variable set. Download and install Java if missing.
-
-3. It's recommended to create a new python env; install the requirements.txt in your python environment.<br>
+2. It's recommended to create a new python env; install the requirements.txt in your python environment.<br>
 `pip install -r requirements.txt`
 
-4. Create a copy of the `configexample.yaml` file, rename to `config.yaml` and update with your config info.
+3. Create a copies of the `configexample.yaml` and `discovr-2021-c63b2ee5e9f6example.json` files, rename to `config.yaml` and `discovr-2021-c63b2ee5e9f6.json`, respectively, and update with your config info.
+
+4. Download both csv files located at path ['ReCOVery/dataset'](https://github.com/apurvamulay/ReCOVery/tree/master/dataset) of the ReCOVery GitHub repository and store in path 'disCOVr/data' of the disCOVr repo.
+
+5. TweetHydratorAPI.ipynb 
