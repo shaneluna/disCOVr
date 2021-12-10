@@ -16,7 +16,7 @@ The ReCOVery dataset is the springboard for the remainder of our project. Tweets
 
 4. Download both csv files located at path ['ReCOVery/dataset'](https://github.com/apurvamulay/ReCOVery/tree/master/dataset) of the ReCOVery GitHub repository and store in path `data/reCOVery` of the disCOVr repo.
 
-5. Run each of the cells in the `TweetHydrator.ipynb` notebook. The output will be json files of hydrated tweets in the `data/tweets` folder. There should be about roughly 1400 json files. 
+5. Run each of the cells in the `TweetHydrator.ipynb` notebook. The output will be json files of hydrated tweets in the `data/tweets` folder. There should be roughly 1400 json files. 
 
 6. Run each of the cells in the `GoogleAPI.ipynb` notebook. The output will be 3 csv files in the `data\news_topics` folder: `news_categories.csv`, `news_entities.csv`, and `news_sentiments.csv`. 
 
