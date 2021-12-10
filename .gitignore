@@ -134,7 +134,3 @@ dmypy.json
 # Project data
 data/
 raw/
-
-# Configs
-*config.yaml
-discovr*.json
